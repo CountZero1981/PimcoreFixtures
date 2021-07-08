@@ -5,7 +5,7 @@
   "require": {
     "pimcore/pimcore": "^6.9",
     "nelmio/alice": "^2.2",
-    "fakerphp/faker": "^1.10",
+    "fzaninotto/faker": "1.6.*",
     "ext-json": "*"
   },
   "license": "MIT",
