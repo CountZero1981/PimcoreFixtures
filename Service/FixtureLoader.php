@@ -1,74 +1,64 @@
 <?php
 namespace FixtureBundle\Service;
 
+use Fidry\AliceDataFixtures\LoaderInterface;
+use Fidry\AliceDataFixtures\Persistence\PersisterAwareInterface;
+use Fidry\AliceDataFixtures\Persistence\PersisterInterface;
 use FixtureBundle\Alice\Providers\Assets;
-use FixtureBundle\Alice\Persister\PimcorePersister;
 use FixtureBundle\Alice\Processor\DocumentProperties;
 use FixtureBundle\Alice\Processor\UserProcessor;
 use FixtureBundle\Alice\Processor\WorkspaceProcessor;
 use FixtureBundle\Alice\Providers\ObjectReference;
-use Nelmio\Alice\Loader\NativeLoader;
 use Pimcore\File;
 
 class FixtureLoader
 {
-
     const FIXTURE_FOLDER = PIMCORE_PRIVATE_VAR. '/bundles/FixtureBundle/fixtures';
     const IMAGES_FOLDER  = PIMCORE_PRIVATE_VAR . '/bundles/FixtureBundle/images';
 
     private static $objects = [];
-    /**
-     * @var bool
-     */
-    private $omitValidation;
-    /**
-     * @var bool
-     */
-    private $checkPathExists;
+
     /**
      * @var Assets
      */
-    private $assetsProvider;
+    private Assets $assetsProvider;
     /**
      * @var ObjectReference
      */
-    private $objectReferenceProvider;
+    private ObjectReference $objectReferenceProvider;
+
+    /** @var LoaderInterface */
+    private LoaderInterface $loader;
+
+    /** @var PersisterInterface */
+    private PersisterInterface $persister;
 
     /**
-     * FixtureLoader constructor.
-     * @param bool $checkPathExists
-     * @param bool $omitValidation
-     */
-    public function __construct($checkPathExists, $omitValidation) {
-        $this->omitValidation = $omitValidation;
-        $this->checkPathExists = $checkPathExists;
-    }
-
-    /**
-     * @required
      * @param Assets $assetsProvider
+     * @param ObjectReference $objectReferenceProvider
+     * @param LoaderInterface $loader
+     * @param PersisterInterface $persister
      */
-    public function setAssetsProvider(Assets $assetsProvider)
+    public function __construct(Assets $assetsProvider, ObjectReference $objectReferenceProvider, LoaderInterface $loader, PersisterInterface $persister)
     {
         $this->assetsProvider = $assetsProvider;
         $this->assetsProvider->setAssetsPath(self::IMAGES_FOLDER);
-    }
 
-    /**
-     * @required
-     * @param ObjectReference $objectReferenceProvider
-     */
-    public function setObjectReferenceProvider(ObjectReference $objectReferenceProvider)
-    {
         $this->objectReferenceProvider = $objectReferenceProvider;
         $this->objectReferenceProvider->setObjects(self::$objects);
+
+        $this->persister = $persister;
+        $this->loader = $loader;
+        if ($this->loader instanceof PersisterAwareInterface) {
+            $this->loader->withPersister($this->persister);
+        }
     }
 
     /**
      * @param array|null $specificFiles Array of files in fixtures folder
      * @return array
      */
-    public static function getFixturesFiles($specificFiles = [])
+    public static function getFixturesFiles(?array $specificFiles = []): array
     {
         self::createFolderDependencies([
             self::FIXTURE_FOLDER,
@@ -89,19 +79,12 @@ class FixtureLoader
     }
 
     /**
-     * @param string $fixtureFile
+     * @param string[] $fixtureFiles
      */
-    public function load($fixtureFile)
+    public function load(array $fixtureFiles): void
     {
-        $processors = [
-            new UserProcessor(),
-            new WorkspaceProcessor(),
-            new DocumentProperties()
-        ];
-        $persister = new PimcorePersister($this->checkPathExists, $this->omitValidation);
-        $basename = basename($fixtureFile);
-        $loader = new NativeLoader();
-        self::$objects[ $basename ] = array_merge(self::$objects,  $loader->load($fixtureFile));
+        $basename = '';
+        self::$objects[ $basename ] = array_merge(self::$objects,  $this->loader->load($fixtureFiles));
     }
 
     /**
