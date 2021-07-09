@@ -1,22 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: qiang
- * Date: 12/01/17
- * Time: 17:25
- */
 
 namespace FixtureBundle\Alice\Providers;
 
+use Faker\Provider\Base as BaseProvider;
 
-class DateTime {
-
-
+class DateTime extends BaseProvider
+{
     /**
      * @param string $date
-     * @return int
+     * @return \DateTime
      */
-    public static function exactDateTime($date = 'now') {
+    public static function exactDateTime(string $date = 'now'): \DateTime
+    {
         return new \DateTime( $date );
     }
 }

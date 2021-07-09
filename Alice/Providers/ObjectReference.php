@@ -12,10 +12,7 @@ class ObjectReference
     /** @var array */
     private static $objects;
 
-    /**
-     * @param array $objects
-     */
-    function __construct(&$objects)
+    public function setObjects(&$objects)
     {
         self::$objects = $objects;
     }
@@ -50,7 +47,7 @@ class ObjectReference
 
     /**
      * @param string $class
-     * @param string $objectsWithClass
+     * @param array $objectsWithClass
      * @return array
      */
     private function filterByClass($class, $objectsWithClass)

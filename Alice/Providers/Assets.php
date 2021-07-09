@@ -3,8 +3,9 @@
 
 namespace FixtureBundle\Alice\Providers;
 
+use Faker\Provider\Base as BaseProvider;
 
-class Assets
+class Assets extends BaseProvider
 {
     /**
      * @var string
@@ -14,14 +15,14 @@ class Assets
     /**
      * @param string $assetsPath
      */
-    public function __construct($assetsPath)
+    public function setAssetsPath(string $assetsPath)
     {
         $this->assetsPath = $assetsPath;
     }
 
     /**
      * @param $filename
-     * @return string
+     * @return resource
      * @throws \Exception
      */
     public function localAsset($filename)

@@ -47,17 +47,14 @@ class GenerateFixturesCommand extends AbstractCommand
 
         $rootFolder = $helper->ask($input, $output, $folderRootQuestion);
 
-        $filenameQuestion = new Question('<info>Choose filename: </info>', 'test');
         $levelsQuestion = new Question('<info>Choose max levels deep (100): </info>', 100);
 
-        $filename = $helper->ask($input, $output, $filenameQuestion);
         $levels = (int)$helper->ask($input, $output, $levelsQuestion);
 
         $output->writeln(
             ['<info>',
                 'You chose: ',
                 'Root folder: <comment>' . $rootFolder . '</comment>',
-                'Filename: <comment>' . $filename . '</comment>',
                 'Max level deep: <comment>' . $levels . '</comment>',
                 '</info>'
             ]);
@@ -76,7 +73,7 @@ class GenerateFixturesCommand extends AbstractCommand
 
         $rootId = Folder::getByPath($rootFolder)->getId();
 
-        $generator = new Generator($rootId, $filename, $levels);
+        $generator = new Generator($rootId, $levels);
         $generator->generateFixturesForFolder();
         $output->writeln('<info>Done. Your fixtures are at: "' . FixtureLoader::FIXTURE_FOLDER . '".</info>');
 

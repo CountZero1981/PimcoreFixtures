@@ -3,6 +3,7 @@
 namespace FixtureBundle\Command;
 
 use FixtureBundle\Service\FixtureLoader;
+use Pimcore\Config;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -89,7 +90,7 @@ class LoadFixturesCommand extends AbstractCommand
      */
     private function cacheFixtures($destination)
     {
-        $conf = Config::getSystemConfig(true);
+        $conf = Config::getSystemConfiguration();
 
         //Store the mysql credentials else mysql will complain
 
@@ -111,8 +112,6 @@ class LoadFixturesCommand extends AbstractCommand
         system($dumpCommand);
 
         fclose($temp); // this removes the file
-
-
     }
 
     /**

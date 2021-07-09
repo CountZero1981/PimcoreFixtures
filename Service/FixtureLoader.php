@@ -3,15 +3,11 @@ namespace FixtureBundle\Service;
 
 use FixtureBundle\Alice\Providers\Assets;
 use FixtureBundle\Alice\Persister\PimcorePersister;
-use FixtureBundle\Alice\Processor\ClassificationStoreProcessor;
 use FixtureBundle\Alice\Processor\DocumentProperties;
 use FixtureBundle\Alice\Processor\UserProcessor;
 use FixtureBundle\Alice\Processor\WorkspaceProcessor;
-use FixtureBundle\Alice\Providers\ClassificationStoreProvider;
-use FixtureBundle\Alice\Providers\DateTime;
-use FixtureBundle\Alice\Providers\General;
 use FixtureBundle\Alice\Providers\ObjectReference;
-use Nelmio\Alice\Fixtures;
+use Nelmio\Alice\Loader\NativeLoader;
 use Pimcore\File;
 
 class FixtureLoader
@@ -29,6 +25,14 @@ class FixtureLoader
      * @var bool
      */
     private $checkPathExists;
+    /**
+     * @var Assets
+     */
+    private $assetsProvider;
+    /**
+     * @var ObjectReference
+     */
+    private $objectReferenceProvider;
 
     /**
      * FixtureLoader constructor.
@@ -39,6 +43,27 @@ class FixtureLoader
         $this->omitValidation = $omitValidation;
         $this->checkPathExists = $checkPathExists;
     }
+
+    /**
+     * @required
+     * @param Assets $assetsProvider
+     */
+    public function setAssetsProvider(Assets $assetsProvider)
+    {
+        $this->assetsProvider = $assetsProvider;
+        $this->assetsProvider->setAssetsPath(self::IMAGES_FOLDER);
+    }
+
+    /**
+     * @required
+     * @param ObjectReference $objectReferenceProvider
+     */
+    public function setObjectReferenceProvider(ObjectReference $objectReferenceProvider)
+    {
+        $this->objectReferenceProvider = $objectReferenceProvider;
+        $this->objectReferenceProvider->setObjects(self::$objects);
+    }
+
     /**
      * @param array|null $specificFiles Array of files in fixtures folder
      * @return array
@@ -68,22 +93,15 @@ class FixtureLoader
      */
     public function load($fixtureFile)
     {
-        $providers = [
-            new Assets(self::IMAGES_FOLDER), // Will provide functionality to load images
-            new ClassificationStoreProvider(),
-            new General(),
-            new DateTime(),
-            new ObjectReference(self::$objects),
-        ];
         $processors = [
-            new ClassificationStoreProcessor(),
             new UserProcessor(),
             new WorkspaceProcessor(),
             new DocumentProperties()
         ];
         $persister = new PimcorePersister($this->checkPathExists, $this->omitValidation);
         $basename = basename($fixtureFile);
-        self::$objects[ $basename ] = array_merge(self::$objects, Fixtures::load($fixtureFile, $persister, ['providers' => $providers], $processors));
+        $loader = new NativeLoader();
+        self::$objects[ $basename ] = array_merge(self::$objects,  $loader->load($fixtureFile));
     }
 
     /**

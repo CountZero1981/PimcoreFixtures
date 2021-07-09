@@ -4,9 +4,10 @@
   "type": "pimcore-bundle",
   "require": {
     "pimcore/pimcore": "^6.9",
-    "nelmio/alice": "^2.2",
-    "fzaninotto/faker": "1.6.*",
-    "ext-json": "*"
+    "nelmio/alice": "3.8.*",
+    "fakerphp/faker": "^1.10",
+    "ext-json": "*",
+    "theofidry/alice-data-fixtures": "^1.4"
   },
   "license": "MIT",
   "authors": [

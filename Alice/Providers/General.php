@@ -4,8 +4,9 @@
 namespace FixtureBundle\Alice\Providers;
 
 use Pimcore\File;
+use Faker\Provider\Base as BaseProvider;
 
-class General
+class General extends BaseProvider
 {
 
     /**

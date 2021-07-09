@@ -15,46 +15,36 @@ use Pimcore\Model\DataObject\Folder;
 use ReflectionClass;
 use Symfony\Component\Yaml\Yaml;
 
-
 class Generator
 {
     const ALL_OBJ_TYPES = [AbstractObject::OBJECT_TYPE_OBJECT, AbstractObject::OBJECT_TYPE_FOLDER , AbstractObject::OBJECT_TYPE_VARIANT];
 
-
     /** @var Folder */
     private $folder;
 
-    /** @var string */
-    private $filename;
     /** @var int */
     private $maxLevels;
 
     /**
      * @param int|string $folderId
-     * @param string $filename
      * @param int $maxLevels
      */
-    public function __construct($folderId, $filename, $maxLevels)
+    public function __construct($folderId, int $maxLevels)
     {
-        $this->validateFields($folderId, $filename, $maxLevels);
+        $this->validateFields($folderId, $maxLevels);
         $this->folder = AbstractObject::getById($folderId);
-        $this->filename = $filename;
-        $this->maxLevels = (int)$maxLevels;
+        $this->maxLevels = $maxLevels;
     }
 
     /**
      * @param $folderId
-     * @param $filename
      * @param $maxLevels
      * @throws \Exception
      */
-    private function validateFields($folderId, $filename, $maxLevels)
+    private function validateFields($folderId, $maxLevels)
     {
         if (is_int($folderId) === false) {
             throw new \Exception('Folder id must be an integer');
-        }
-        if (preg_match('/^[a-z0-9_]*$/', $filename) === 0) {
-            throw new \Exception('Filename must be snake_case');
         }
         if (is_int($maxLevels) === false) {
             throw new \Exception('Levels must be an integer');
@@ -110,7 +100,6 @@ class Generator
         return count(explode('/', $fullPath)) - 1;
     }
 
-
     /**
      * Outputs array to yml
      * @param array $data
@@ -119,7 +108,6 @@ class Generator
      */
     private function writeToFile($data, $class, $level)
     {
-
         $yaml = Yaml::dump($data, 3);
 
         $fixturesFolder = FixtureLoader::FIXTURE_FOLDER . '_generated' . DIRECTORY_SEPARATOR;
@@ -136,5 +124,4 @@ class Generator
         $fullPath = $fixturesFolder . $filename . '.yml';
         file_put_contents($fullPath, $yaml);
     }
-
 }

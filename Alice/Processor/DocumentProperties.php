@@ -8,8 +8,7 @@
 
 namespace FixtureBundle\Alice\Processor;
 
-
-use Nelmio\Alice\ProcessorInterface;
+use Fidry\AliceDataFixtures\ProcessorInterface;
 use Pimcore\Model\Document;
 use Pimcore\Model\Property;
 
@@ -18,7 +17,7 @@ class DocumentProperties implements ProcessorInterface
     private $allowedDocumentTypes = ['page', 'link'];
     /**
      * This might future version proof, because this properties might change
-     * but this are set in Ext and there is no way to get them in php
+     * but these are set in Ext and there is no way to get them in php
      * @see pimcore/static/js/pimcore/document/properties.js
      * @var array
      */
@@ -107,24 +106,24 @@ class DocumentProperties implements ProcessorInterface
      * ]
      * and replaces the original content with the newly generated format
      *
-     * @param Document\Page|Document\Link $document instance to process
+     * @param Document\Page|Document\Link $object instance to process
      */
-    public function preProcess($document)
+    public function preProcess(string $id, $object): void
     {
-        if ($this->isKnownDocumentType($document) === false) {
+        if ($this->isKnownDocumentType($object) === false) {
             return;
         }
 
         // Get properties as array from fixtures and erase them
-        $propertiesFromYaml = $document->getProperties();
-        $document->setProperties(null);
+        $propertiesFromYaml = $object->getProperties();
+        $object->setProperties(null);
         if (is_array($propertiesFromYaml) && !empty($propertiesFromYaml)) {
             $propertiesFromYaml = array_merge($this->defaultProperties, $propertiesFromYaml);
             $newProperties = [];
             foreach ($propertiesFromYaml as $key => $property) {
                 $newProperties[] = $this->getFormattedProperty($key, $property);
             }
-            $document->setProperties($newProperties);
+            $object->setProperties($newProperties);
         }
 
     }
@@ -145,7 +144,7 @@ class DocumentProperties implements ProcessorInterface
      *
      * @param Document\Page|Document\Link $document instance to process
      */
-    public function postProcess($document)
+    public function postProcess(string $id, $document): void
     {
     }
 

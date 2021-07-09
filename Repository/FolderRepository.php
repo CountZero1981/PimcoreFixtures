@@ -8,13 +8,11 @@
 
 namespace FixtureBundle\Repository;
 
-
 use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\AbstractObject;
 
 class FolderRepository
 {
-
     /**
      * @param $query
      * @return AbstractObject[]
