@@ -9,6 +9,12 @@ services:
     # if you need to do this, you can override this setting on individual services
     public: false
 
-  _instanceof:
-    Pimcore\Console\AbstractCommand:
-      tags: ['console.command']
+  FixtureBundle\Command\:
+    resource: '../../Command'
+    tags: ['console.command']
+
+  FixtureBundle\Service\:
+    resource: '../../Service'
+
+  FixtureBundle\Alice\:
+    resource: '../../Alice'
