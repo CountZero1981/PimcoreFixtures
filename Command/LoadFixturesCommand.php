@@ -14,6 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class LoadFixturesCommand extends AbstractCommand
 {
+    /** @var FixtureLoader */
+    private FixtureLoader $fixtureLoader;
+
     protected function configure()
     {
         $this
@@ -30,8 +33,6 @@ class LoadFixturesCommand extends AbstractCommand
     {
 
         $withCache = $input->getOption('with-cache');
-        $omitValidation = $input->getOption('omit-validation');
-        $checkPathExists = $input->getOption('check-path-exists');
         $files = $input->getOption('files') ? explode(',', $input->getOption('files')) : null;
         $fixtureFiles = FixtureLoader::getFixturesFiles($files);
         $fingerPrintFilePath = PIMCORE_TEMPORARY_DIRECTORY . '/pimcore_fixtures_cache_' . $this->getSha1FromFixtures($fixtureFiles). '.sql';
@@ -46,7 +47,8 @@ class LoadFixturesCommand extends AbstractCommand
             $progress->start();
             $progress->setFormat(" %current%/%max% [%bar%] <info>%percent:3s%% %elapsed:6s% %memory:6s%\t%message%</info>");
 
-            $fixtureLoader = new FixtureLoader($checkPathExists, $omitValidation);
+            $this->fixtureLoader->load($fixtureFiles);
+            $fixtureLoader = new FixtureLoader();
             foreach ($fixtureFiles as $fixtureFile) {
                 $progress->setMessage('<comment>Loading</comment>  ' . str_replace(defined('PIMCORE_PRIVATE_VAR') ? PIMCORE_PRIVATE_VAR : PIMCORE_WEBSITE_VAR, '', $fixtureFile));
                 $progress->advance();

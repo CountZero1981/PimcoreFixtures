@@ -2,7 +2,7 @@
 
 namespace FixtureBundle\Alice\Persister;
 
-use Nelmio\Alice\PersisterInterface;
+use Fidry\AliceDataFixtures\Persistence\PersisterInterface;
 use Pimcore\Model\Asset;
 use Pimcore\Model\Document;
 use Pimcore\Model\Element\AbstractElement;
@@ -17,7 +17,6 @@ use Pimcore\Model\DataObject\QuantityValue;
 
 class PimcorePersister implements PersisterInterface
 {
-
     /**
      * @var bool
      */
@@ -31,7 +30,7 @@ class PimcorePersister implements PersisterInterface
      * @param bool $checkPathExists
      * @param bool $omitValidation
      */
-    public function __construct($checkPathExists, $omitValidation)
+    public function __construct(bool $checkPathExists, bool $omitValidation)
     {
         $this->checkPathExists = $checkPathExists;
         $this->omitValidation = $omitValidation;
@@ -40,13 +39,11 @@ class PimcorePersister implements PersisterInterface
     /**
      * Loads a fixture file
      *
-     * @param AbstractObject array [object] $objects instance to persist in the DB
+     * @param DataObject\Concrete|Document|Asset array [object] $objects instance to persist in the DB
      * @throws \Exception
      */
-    public function persist(array $objects)
+    public function persist($object)
     {
-
-        foreach ($objects as $object) {
             switch (true) {
                 case $object instanceof AbstractElement:
                     $this->persistObject($object);
@@ -79,7 +76,6 @@ class PimcorePersister implements PersisterInterface
 //                    return null;
 //                default:
 //                    var_dump(get_class($object));
-            }
         }
     }
 
@@ -119,28 +115,19 @@ class PimcorePersister implements PersisterInterface
      */
     private function persistUser($object)
     {
-
-        if ($this->ignorePathAlreadyExists === true) {
-            $tmpObj = $object::getByName($object->getName());
-
-            if ($tmpObj) {
-                $object->setId($tmpObj->getId());
-            }
-        }
         $object->save();
-
     }
 
     /**
-     * @param \stdClass $object
+     * @param AbstractObject $object
      */
-    private function persistClassWithSave($object)
+    private function persistClassWithSave(AbstractObject $object)
     {
         $object->save();
     }
 
     /**
-     * @param Object\Objectbrick\Data\AbstractData $objectBrick
+     * @param DataObject\Objectbrick\Data\AbstractData $objectBrick
      * @throws \UnexpectedValueException
      */
     private function persistObjectBrickSave($objectBrick)
@@ -173,4 +160,8 @@ class PimcorePersister implements PersisterInterface
         return $obj;
     }
 
+    public function flush()
+    {
+        // TODO: Implement flush() method.
+    }
 }
