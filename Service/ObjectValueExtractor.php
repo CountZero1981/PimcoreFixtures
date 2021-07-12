@@ -4,6 +4,7 @@ namespace FixtureBundle\Service;
 
 use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\AbstractObject;
+use Pimcore\Model\DataObject\ClassDefinition\Data\ReverseObjectRelation;
 use ReflectionClass;
 
 class ObjectValueExtractor
@@ -98,7 +99,7 @@ class ObjectValueExtractor
     private function getDataForField($object, $key, $fieldDefinition)
     {
         if ($fieldDefinition instanceof DataObject\ClassDefinition\Data\Relations\AbstractRelations) {
-            $relations = $object->getRelationData($key, !$fieldDefinition->isRemoteOwner(), null);
+            $relations = $object->getRelationData($key, !$fieldDefinition instanceof ReverseObjectRelation, null);
 
             $value = [];
             if (count($relations)) {
@@ -122,9 +123,8 @@ class ObjectValueExtractor
 
         $getter = "get" . ucfirst($key);
         $fieldData = $object->$getter();
-        $value = $fieldDefinition->getDataForEditmode($fieldData, $object);
 
-        return $value;
+        return $fieldDefinition->getDataForEditmode($fieldData, $object);
     }
 
     /**
