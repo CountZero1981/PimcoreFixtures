@@ -3,7 +3,7 @@
   "description": "Load yml fixtures in pimcore",
   "type": "pimcore-bundle",
   "require": {
-    "pimcore/pimcore": "^6.9",
+    "pimcore/pimcore": "^10.0",
     "nelmio/alice": "3.8.*",
     "fakerphp/faker": "^1.10",
     "ext-json": "*",
